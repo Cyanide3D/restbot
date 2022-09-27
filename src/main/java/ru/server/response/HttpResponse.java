@@ -32,6 +32,9 @@ public class HttpResponse {
     }
 
 
+    public HttpStatus getStatus() {
+        return status;
+    }
 
     public void setStatus(HttpStatus status) {
         this.status = status;

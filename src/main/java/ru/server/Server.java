@@ -1,8 +1,13 @@
 package ru.server;
 
-import ru.Configuration;
+import ru.server.configure.Configuration;
+import ru.server.constants.ContentType;
+import ru.server.constants.HttpStatus;
+import ru.server.controller.DispatcherController;
+import ru.server.exception.HttpException;
 import ru.server.request.HttpRequest;
 import ru.server.response.HttpResponse;
+import ru.server.view.ViewResolver;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,12 +20,14 @@ import java.util.concurrent.TimeUnit;
 
 public class Server {
 
-    private final HttpRequestHandler handler;
     private final Configuration configuration;
+    private final DispatcherController controller;
+    private final ViewResolver viewResolver;
 
-    public Server(Configuration configuration, HttpRequestHandler handler) {
+    public Server(Configuration configuration, DispatcherController controller, ViewResolver viewResolver) {
+        this.controller = controller;
         this.configuration = configuration;
-        this.handler = handler;
+        this.viewResolver = viewResolver;
     }
 
 
@@ -28,18 +35,26 @@ public class Server {
         try {
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel.open();
             serverSocketChannel.bind(new InetSocketAddress(configuration.getServerIp(), Integer.parseInt(configuration.getServerPort())));
-
             while (true) {
                 Future<AsynchronousSocketChannel> client = serverSocketChannel.accept();
                 try {
                     AsynchronousSocketChannel socketChannel = client.get(60, TimeUnit.SECONDS);
-                    String req = readRequest(socketChannel);
-
-                    HttpRequest httpRequest = new HttpRequest(req);
                     HttpResponse httpResponse = new HttpResponse();
-
-                    handler.handle(httpRequest, httpResponse);
-
+                    try {
+                        String req = readRequest(socketChannel);
+                        HttpRequest httpRequest = new HttpRequest(req);
+                        viewResolver.handle(controller.handleRequestByController(httpRequest, httpResponse));
+                    } catch (ArrayIndexOutOfBoundsException | IllegalArgumentException e) {
+                        HttpException.errorResponse(httpResponse, HttpStatus.BAD_REQUEST);
+                        e.printStackTrace();
+                    } catch (HttpException e){
+                        e.errorResponse(httpResponse);
+                    } catch (Exception e) {
+                        HttpException.errorResponse(httpResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+                        e.printStackTrace();
+                    }
+                    httpResponse.setBody(viewResolver.getTemplateAsText());
+                    httpResponse.addHeader("Content-Type", viewResolver.getContentType());
                     socketChannel.write(ByteBuffer.wrap(httpResponse.message().getBytes())).get();
                     socketChannel.close();
                 } catch (Exception e) {

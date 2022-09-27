@@ -1,4 +1,4 @@
-package ru;
+package ru.server.configure;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +15,10 @@ public class Configuration {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String getControllersPath() {
+        return properties.getProperty("CONTROLLER_PATH");
     }
 
     public String getBotToken() {

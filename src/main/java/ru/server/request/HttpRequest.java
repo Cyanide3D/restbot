@@ -8,6 +8,8 @@ public class HttpRequest {
     private final Headers headers;
     private final String body;
     private final HttpMethod method;
+    private final String path;
+    private final String protocol;
 
     private final static String DELIMITER = "\r\n\r\n";
     private final static String NEW_LINE = "\r\n";
@@ -26,7 +28,18 @@ public class HttpRequest {
             this.headers.addHeader(headerParts[0].trim(), headerParts[1].trim());
         }
 
-        this.method = HttpMethod.valueOf(headLines[0].split(" ")[0]);
+        String[] fl = headLines[0].split(" ");
+        this.method = HttpMethod.valueOf(fl[0]);
+        this.path = fl[1];
+        this.protocol = fl[2];
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getProtocol() {
+        return protocol;
     }
 
     public Headers getHeaders() {

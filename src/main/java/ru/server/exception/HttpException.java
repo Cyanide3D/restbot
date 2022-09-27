@@ -14,12 +14,21 @@ public class HttpException extends RuntimeException {
     }
 
     public void errorResponse(HttpResponse response) {
+        errorResponse(response, status);
+    }
+
+    public static void errorResponse(HttpResponse response, HttpStatus status) {
         response.setStatus(status);
+        fillResponse(response);
+    }
+
+    private static void fillResponse(HttpResponse response) {
         response.setHeaders(new Headers());
         response.addHeader("Connection", "Close");
         response.addHeader("Content-Type", ContentType.JSON);
 
-        response.setBody(String.format("{\"code\":\"%d\",\"message\":\"%s\"}", status.getStatusCode(), status.getStatus()));
+        response.setBody(String.format("{\"code\":\"%d\",\"message\":\"%s\"}", response.getStatus().getStatusCode(), response.getStatus().getStatus()));
     }
+
 
 }

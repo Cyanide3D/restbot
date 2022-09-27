@@ -3,7 +3,7 @@ package ru.bot;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
-import ru.Configuration;
+import ru.server.configure.Configuration;
 
 public class Bot {
 
