@@ -1,7 +1,5 @@
 package ru.server.util;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class UrlUtil {
 
     public static String cutSlash(String path) {

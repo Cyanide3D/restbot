@@ -15,6 +15,11 @@ public class JsonViewResolver implements ViewResolver {
     }
 
     @Override
+    public void setPrefix(String prefix) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void setTemplatePath(String path) {
         throw new UnsupportedOperationException();
     }

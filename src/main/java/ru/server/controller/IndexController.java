@@ -4,6 +4,7 @@ import ru.bot.Bot;
 import ru.server.FormDataParser;
 import ru.server.constants.ContentType;
 import ru.server.controller.annotations.Controller;
+import ru.server.controller.annotations.Get;
 import ru.server.controller.annotations.Post;
 import ru.server.exception.BadRequestHttpException;
 import ru.server.exception.UnsupportedMTHttpException;
@@ -28,6 +29,11 @@ public class IndexController {
 
         bot.sendMessage(MessageFormat.format("*{0}*\n{1}", title, message));
         return "{\"status\":\"Vse zaebis\"}";
+    }
+
+    @Get()
+    public String index() {
+        return "index";
     }
 
 }
