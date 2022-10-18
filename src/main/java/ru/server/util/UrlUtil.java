@@ -11,4 +11,8 @@ public class UrlUtil {
         return result;
     }
 
+    public static String[] asArray(String path) {
+        return cutSlash(path).split("/");
+    }
+
 }

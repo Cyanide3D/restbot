@@ -10,21 +10,6 @@ public class JsonViewResolver implements ViewResolver {
     private String result = "{}";
 
     @Override
-    public void setPostfix(String postfix) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setPrefix(String prefix) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setTemplatePath(String path) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public String getTemplateAsText() {
         return result;
     }

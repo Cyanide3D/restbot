@@ -2,17 +2,27 @@ package ru.server.view;
 
 import ru.server.constants.ContentType;
 import ru.server.exception.InternalServerHttpException;
+import ru.server.view.data.ViewData;
+import ru.server.view.html.HtmlInterpreter;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class HtmlViewResolver implements ViewResolver {
+public class HtmlViewResolver implements TemplateViewResolver {
 
     private String prefix = "";
-    private String postfix = "";
+    private String postfix = ".html";
     private Path templatesPath = null;
     private String result = "";
+
+    private final HtmlInterpreter interpreter;
+    private final ViewData viewData;
+
+    public HtmlViewResolver(HtmlInterpreter interpreter, ViewData viewData) {
+        this.interpreter = interpreter;
+        this.viewData = viewData;
+    }
 
     @Override
     public void setPostfix(String postfix) {
@@ -37,17 +47,19 @@ public class HtmlViewResolver implements ViewResolver {
     }
 
     @Override
-    public void handle(Object methodReturn) {
-        try {
+    public void handle(Object methodReturn) throws IOException {
             if (methodReturn instanceof String) {
-                Path path = Files.list(templatesPath).filter(p -> p.getFileName().toString().equals(prefix + methodReturn + postfix)).findFirst().orElseThrow(IllegalArgumentException::new);
-                result = Files.readString(path);
+                Path temp = templatesPath.resolve((String) methodReturn);
+                result = interpreter.Interpretation(getResult(temp.getParent(), temp.getFileName().toString()), viewData);
             } else {
                 throw new InternalServerHttpException();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    }
+
+    private String getResult(Path temp, String filename) throws IOException {
+        return Files.readString(Files.list(temp)
+                .filter(p -> p.getFileName().toString().equals(prefix + filename + postfix))
+                .findFirst().orElseThrow(IllegalArgumentException::new));
     }
 
     @Override
