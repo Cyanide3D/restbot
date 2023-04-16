@@ -14,7 +14,6 @@ import ru.server.view.HtmlViewResolver;
 import ru.server.view.TemplateViewResolver;
 import ru.server.view.data.ModelViewData;
 import ru.server.view.data.ViewData;
-import ru.server.view.html.HtmlInterpreterImpl;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -39,8 +38,8 @@ public class Server {
         try {
             DispatcherController controller = new DispatcherControllerImpl(configuration.getControllersPath()); //TODO controller and resolver should be created somewhere out (DI or config)
             ViewData viewData = new ModelViewData();
-            TemplateViewResolver viewResolver = new HtmlViewResolver(new HtmlInterpreterImpl(), viewData);
-            viewResolver.setTemplatePath("templates");
+//            TemplateViewResolver viewResolver = new HtmlViewResolver(new HtmlInterpreterImpl(), viewData);
+//            viewResolver.setTemplatePath("templates");
 
 
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel.open();
@@ -52,9 +51,9 @@ public class Server {
                     HttpRequest httpRequest = new HttpRequest(readRequest(socketChannel));
                     controller.setArgs(new ControllerArgs(new Params(httpRequest.getPath()), httpRequest, httpResponse, bot, viewData));
 
-                    viewResolver.handle(controller.handleRequestByController(httpRequest));
-                    httpResponse.setBody(viewResolver.getTemplateAsText());
-                    httpResponse.addHeader("Content-Type", viewResolver.getContentType());
+//                    viewResolver.handle(controller.handleRequestByController(httpRequest));
+//                    httpResponse.setBody(viewResolver.getTemplateAsText());
+//                    httpResponse.addHeader("Content-Type", viewResolver.getContentType());
 
                     socketChannel.write(ByteBuffer.wrap(httpResponse.message().getBytes())).get();
                 } catch (ArrayIndexOutOfBoundsException | IllegalArgumentException e) {

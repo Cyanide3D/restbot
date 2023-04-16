@@ -85,22 +85,12 @@ public class ControllerTree {
     }
 
     private String getMethodPath(HttpMethod httpMethod, Method method) {
-        switch (httpMethod) {
-            case GET -> {
-                return method.getAnnotation(Get.class).path();
-            }
-            case POST -> {
-                return method.getAnnotation(Post.class).path();
-            }
-            case PATCH -> {
-                return method.getAnnotation(Patch.class).path();
-            }
-            case DELETE -> {
-                return method.getAnnotation(Delete.class).path();
-            }
-        }
-
-        throw new UnsupportedHttpMethodException();
+        return switch (httpMethod) {
+            case GET -> method.getAnnotation(Get.class).path();
+            case POST -> method.getAnnotation(Post.class).path();
+            case PATCH -> method.getAnnotation(Patch.class).path();
+            case DELETE -> method.getAnnotation(Delete.class).path();
+        };
     }
 
 
