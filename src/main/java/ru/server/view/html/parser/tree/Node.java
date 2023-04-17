@@ -8,7 +8,7 @@ public abstract class Node {
     protected Map<String, String> attributes;
     protected List<Node> children;
 
-    private final Set<String> nonClosableTags = Set.of("meta", "br");
+    private final Set<String> nonClosableTags = Set.of("meta", "br", "!DOCTYPE");
 
     public Node() {
         this.children = new ArrayList<>();
@@ -36,5 +36,17 @@ public abstract class Node {
 
     public boolean isNonClosableTag() {
         return nonClosableTags.contains(value);
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getAttr(String key) {
+        return attributes.get(key);
+    }
+
+    public List<Node> getChildren() {
+        return children;
     }
 }

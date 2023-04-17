@@ -10,16 +10,18 @@ import ru.server.exception.HttpException;
 import ru.server.request.HttpRequest;
 import ru.server.request.Params;
 import ru.server.response.HttpResponse;
-import ru.server.view.HtmlViewResolver;
-import ru.server.view.TemplateViewResolver;
 import ru.server.view.data.ModelViewData;
 import ru.server.view.data.ViewData;
+import ru.server.view.html.engine.BasicHtmlTemplateEngine;
+import ru.server.view.resolver.HtmlViewResolver;
+import ru.server.view.resolver.TemplateViewResolver;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -38,8 +40,8 @@ public class Server {
         try {
             DispatcherController controller = new DispatcherControllerImpl(configuration.getControllersPath()); //TODO controller and resolver should be created somewhere out (DI or config)
             ViewData viewData = new ModelViewData();
-//            TemplateViewResolver viewResolver = new HtmlViewResolver(new HtmlInterpreterImpl(), viewData);
-//            viewResolver.setTemplatePath("templates");
+            TemplateViewResolver viewResolver = new HtmlViewResolver(new BasicHtmlTemplateEngine(Path.of("patterns")), viewData);
+            viewResolver.setTemplatePath("templates");
 
 
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel.open();
@@ -50,11 +52,9 @@ public class Server {
                 try (AsynchronousSocketChannel socketChannel = client.get()) {
                     HttpRequest httpRequest = new HttpRequest(readRequest(socketChannel));
                     controller.setArgs(new ControllerArgs(new Params(httpRequest.getPath()), httpRequest, httpResponse, bot, viewData));
-
-//                    viewResolver.handle(controller.handleRequestByController(httpRequest));
-//                    httpResponse.setBody(viewResolver.getTemplateAsText());
-//                    httpResponse.addHeader("Content-Type", viewResolver.getContentType());
-
+                    String body = viewResolver.handle(controller.handleRequestByController(httpRequest));
+                    httpResponse.setBody(body);
+                    httpResponse.addHeader("Content-Type", viewResolver.getContentType());
                     socketChannel.write(ByteBuffer.wrap(httpResponse.message().getBytes())).get();
                 } catch (ArrayIndexOutOfBoundsException | IllegalArgumentException e) {
                     HttpException.errorResponse(httpResponse, HttpStatus.BAD_REQUEST);

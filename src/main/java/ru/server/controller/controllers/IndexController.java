@@ -1,20 +1,9 @@
 package ru.server.controller.controllers;
 
-import ru.bot.Bot;
-import ru.server.FormDataParser;
-import ru.server.constants.ContentType;
 import ru.server.controller.annotations.Controller;
 import ru.server.controller.annotations.Get;
 import ru.server.controller.annotations.PathArg;
-import ru.server.controller.annotations.Post;
-import ru.server.exception.BadRequestHttpException;
-import ru.server.exception.UnsupportedMTHttpException;
-import ru.server.request.HttpRequest;
-import ru.server.response.HttpResponse;
 import ru.server.view.data.ModelViewData;
-import ru.server.view.data.ViewData;
-
-import java.text.MessageFormat;
 
 @Controller
 public class IndexController {
@@ -38,6 +27,7 @@ public class IndexController {
     public String index(ModelViewData data) {
         data.put("main", "hello world!");
         data.put("how", "qweqweqwe");
+        System.out.println("ENDPOINT WORK!");
         return "index/index";
     }
 

@@ -8,20 +8,17 @@ import ru.server.view.html.parser.tree.Node;
 import ru.server.view.html.parser.tree.TagNode;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Stack;
 
 public class HtmlParser {
 
-    public Node parse(String path) {
+    public Node parse(InputStream source) {
         Node head = new HeadNode();
-        try {
-            Tokenizer tokenizer = new Tokenizer(Files.newInputStream(Path.of(path)));
-            parseNode(tokenizer, tokenizer.nextToken(), head);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Tokenizer tokenizer = new Tokenizer(source);
+        parseNode(tokenizer, tokenizer.nextToken(), head);
 
         return head;
     }

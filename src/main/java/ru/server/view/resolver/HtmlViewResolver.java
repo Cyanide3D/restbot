@@ -1,11 +1,12 @@
-package ru.server.view;
+package ru.server.view.resolver;
 
 import ru.server.constants.ContentType;
 import ru.server.exception.InternalServerHttpException;
 import ru.server.view.data.ViewData;
-import ru.server.view.html.HtmlInterpreter;
+import ru.server.view.html.engine.HtmlTemplateEngine;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -14,13 +15,11 @@ public class HtmlViewResolver implements TemplateViewResolver {
     private String prefix = "";
     private String postfix = ".html";
     private Path templatesPath = null;
-    private String result = "";
-
-    private final HtmlInterpreter interpreter;
+    private final HtmlTemplateEngine engine;
     private final ViewData viewData;
 
-    public HtmlViewResolver(HtmlInterpreter interpreter, ViewData viewData) {
-        this.interpreter = interpreter;
+    public HtmlViewResolver(HtmlTemplateEngine engine, ViewData viewData) {
+        this.engine = engine;
         this.viewData = viewData;
     }
 
@@ -42,24 +41,13 @@ public class HtmlViewResolver implements TemplateViewResolver {
     }
 
     @Override
-    public String getTemplateAsText() {
-        return result;
-    }
-
-    @Override
-    public void handle(Object methodReturn) throws IOException {
+    public String handle(Object methodReturn) throws IOException {
             if (methodReturn instanceof String) {
-                Path temp = templatesPath.resolve((String) methodReturn);
-                result = interpreter.Interpretation(getResult(temp.getParent(), temp.getFileName().toString()), viewData);
+                Path temp = templatesPath.resolve(prefix + methodReturn + postfix);
+                return engine.handle(temp, viewData);
             } else {
                 throw new InternalServerHttpException();
             }
-    }
-
-    private String getResult(Path temp, String filename) throws IOException {
-        return Files.readString(Files.list(temp)
-                .filter(p -> p.getFileName().toString().equals(prefix + filename + postfix))
-                .findFirst().orElseThrow(IllegalArgumentException::new));
     }
 
     @Override

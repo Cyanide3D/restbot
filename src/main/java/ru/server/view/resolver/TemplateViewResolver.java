@@ -1,6 +1,4 @@
-package ru.server.view;
-
-import javax.swing.text.View;
+package ru.server.view.resolver;
 
 public interface TemplateViewResolver extends ViewResolver {
 

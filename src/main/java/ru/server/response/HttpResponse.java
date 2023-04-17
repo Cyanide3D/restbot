@@ -3,7 +3,6 @@ package ru.server.response;
 import ru.server.constants.ContentType;
 import ru.server.Headers;
 import ru.server.constants.HttpStatus;
-import ru.server.view.ViewResolver;
 
 public class HttpResponse {
 

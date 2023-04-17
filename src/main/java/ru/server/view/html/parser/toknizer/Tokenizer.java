@@ -15,7 +15,7 @@ public class Tokenizer {
 
     public Token nextToken() {
         try {
-            char c = chopChars(nextChar(), ' ', '\n', '\t');
+            char c = chopChars(nextChar(), ' ', '\n', '\t', '\r');
             if (state == State.NAME && Character.isAlphabetic(c) || c == '<' || c == '/')
                 return name(c);
             if (((state == State.ATTR_NAME || state == State.ATTR_VALUE) && c == '>') || state == State.BODY)
