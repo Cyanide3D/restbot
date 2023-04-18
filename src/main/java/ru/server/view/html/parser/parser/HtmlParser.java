@@ -7,10 +7,7 @@ import ru.server.view.html.parser.tree.HeadNode;
 import ru.server.view.html.parser.tree.Node;
 import ru.server.view.html.parser.tree.TagNode;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Stack;
 
 public class HtmlParser {
@@ -24,30 +21,31 @@ public class HtmlParser {
     }
 
     private void parseNode(Tokenizer tokenizer, Token token, Node node) {
-        Node n = new TagNode();
-        node.addChild(n);
+        TagNode tag = new TagNode();
+        node.addChild(tag);
         Stack<Token> attrs = new Stack<>();
         do {
             switch (token.getType()) {
                 case TAG_NAME -> {
-                    if (token.isClose()) return;
-                    if (n.isAssigned()) {
-                        if (n.isNonClosableTag()) {
-                            parseNode(tokenizer, token, node);
-                        } else {
-                            parseNode(tokenizer, token, n);
-                        }
+                    if (token.isClose()) {
+                        return;
+                    } else if (tag.isAssigned() && !tag.isNonClosableTag()) {
+                        parseNode(tokenizer, token, tag);
+                    } else if (tag.isNonClosableTag()) {
+                        tag = new TagNode();
+                        node.addChild(tag);
+                        tag.setValue(token.getValue());
                     } else {
-                        n.setValue(token.getValue());
+                        tag.setValue(token.getValue());
                     }
                 }
                 case TAG_BODY -> {
                     Node body = new BodyNode();
                     body.setValue(token.getValue());
-                    n.addChild(body);
+                    tag.addChild(body);
                 }
                 case TAG_ATTR_NAME -> attrs.push(token);
-                case TAG_ATTR_VALUE -> n.addAttr(attrs.pop().getValue(), token.getValue());
+                case TAG_ATTR_VALUE -> tag.addAttr(attrs.pop().getValue(), token.getValue());
             }
         } while (tokenizer.hasNext() && (token = tokenizer.nextToken()) != null);
     }
